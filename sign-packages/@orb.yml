@@ -1,0 +1,12 @@
+---
+version: 2.1
+
+description: |
+  Utilities for simplifying CircleCI workflows from OpenNMS.
+
+  For any signing to work, we rely on the `allow-loopback-pinentry` feature
+  of GnuPG, which was introduced in GnuPG 2.1.
+  For RPM package signing, you must have the `rpm-sign` utility installed.
+  For Debian package signing, you must have the `debsigs` utility installed.
+
+  Source: https://github.com/opennms/orb

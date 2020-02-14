@@ -1,0 +1,19 @@
+---
+description: Sign an RPM package
+usage:
+  version: 2.1
+  orbs:
+    sign-packages: opennms/sign-packages@0.0.1
+  jobs:
+    build:
+      docker:
+        - image: centos:7
+      steps:
+        - run:
+            command: |
+              # do some stuff to build an RPM in dist/packages/
+        - sign-packages/install-rpm-dependencies
+        - sign-packages/setup-env
+        - sign-packages/sign-rpms:
+            gpgname: opennms@opennms.org
+            packages: dist/packages/*.rpm

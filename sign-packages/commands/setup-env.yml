@@ -1,0 +1,42 @@
+---
+description: >
+  Prepare the environment for GnuPG Debian and RPM signing, including
+  initializing ~/.gnupg for loopback password entry and setting up
+  ~/.rpmmacros to maximize compatibility.
+steps:
+  - run:
+      name: Configure GnuPG
+      command: |
+        if [ -z "$GPG_PASSPHRASE" ]; then
+          echo "WARNING: no Base64 GPG passphrase supplied in CircleCI environment"
+        fi
+        if [ -z "$GPG_SECRET_KEY" ]; then
+          echo "ERROR: you must set \$GPG_SECRET_KEY with the Base64-encoded contents of your GPG secret key"
+          exit 1
+        fi
+        export GNUPGHOME="$HOME/.gnupg"
+        eval $(gpg-agent --daemon --allow-loopback-pinentry)
+        install -d -m 700 "$GNUPGHOME"
+        echo "* created $GNUPGHOME"
+        echo "$GPG_SECRET_KEY" | base64 --decode | gpg --import --no-tty --batch --yes
+        echo "* imported secret key"
+        echo use-agent >> "$GNUPGHOME/gpg.conf"
+        echo pinentry-mode loopback >> "$GNUPGHOME/gpg.conf"
+        echo "passphrase-file $HOME/.gpg-passphrase" >> "$GNUPGHOME/gpg.conf"
+        echo "* created $GNUPGHOME/gpg.conf:"
+        cat "$GNUPGHOME/gpg.conf"
+        echo allow-loopback-pinentry >> "$GNUPGHOME/gpg-agent.conf"
+        echo "* created $GNUPGHOME/gpg-agent.conf"
+        cat "$GNUPGHOME/gpg-agent.conf"
+        echo RELOADAGENT | gpg-connect-agent
+        echo "* (re)launched gpg-agent"
+  - run:
+      name: Configure RPM Macros
+        echo "%topdir $HOME/rpmbuild" > "$HOME/.rpmmacros"
+        echo "%_source_filedigest_algorithm 0" >> "$HOME/.rpmmacros"
+        echo "%_binary_filedigest_algorithm 0" >> "$HOME/.rpmmacros"
+        echo "%_source_payload w0.bzdio" >> "$HOME/.rpmmacros"
+        echo "%_binary_payload w0.bzdio" >> "$HOME/.rpmmacros"
+        echo "%__gpg_sign_cmd %{__gpg} gpg --batch --no-verbose --no-armor --no-secmem-warning --force-v3-sigs %{?_gpg_sign_cmd_extra_args:%{_gpg_sign_cmd_extra_args}} --passphrase-file "$HOME/.gpg-passphrase" -u '%{_gpg_name}' -sbo %{__signature_filename} %{__plaintext_filename}" >> "$HOME/.rpmmacros"
+        echo "* created $HOME/.rpmmacros:"
+        cat "$HOME/.rpmmacros"

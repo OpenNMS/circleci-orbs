@@ -1,0 +1,5 @@
+# ignore generated files
+/workspace/
+
+# vim droppings
+.*.sw[op]

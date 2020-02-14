@@ -1,0 +1,6 @@
+---
+description: Install RPM dependencies necessary for package signing.
+steps:
+  - run:
+      name: Install RPM Signing Dependencies
+      command: yum -y install rpm-sign gnupg2

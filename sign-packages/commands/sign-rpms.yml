@@ -1,0 +1,21 @@
+---
+description: Sign one or more RPM packages.
+parameters:
+  gpgname:
+    description: the name/email or key ID to use when signing
+    type: string
+  packages:
+    description: the RPM packages to sign
+    type: string
+steps:
+  - run:
+      name: Sign RPM Packages
+      command: |
+        export GNUPGHOME="$HOME/.gnupg"
+        echo "$GPG_PASSPHRASE" \
+          | base64 --decode
+          > "$HOME/.gpg-passphrase" \
+          && chmod 600 "$HOME/.gpg-passphrase"
+        rpmsign \
+          --key-id='<< parameters.gpgname >>' \
+          --resign << parameters.packages >>
