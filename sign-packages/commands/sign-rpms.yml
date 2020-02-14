@@ -17,5 +17,6 @@ steps:
           > "$HOME/.gpg-passphrase" \
           && chmod 600 "$HOME/.gpg-passphrase"
         rpmsign \
+          --define "passphrase_file $HOME/.gpg-passphrase" \
           --key-id='<< parameters.gpgname >>' \
           --resign << parameters.packages >>
