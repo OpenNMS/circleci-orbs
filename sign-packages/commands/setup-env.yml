@@ -32,6 +32,7 @@ steps:
         echo "* (re)launched gpg-agent"
   - run:
       name: Configure RPM Macros
+      command: |
         echo "%topdir $HOME/rpmbuild" > "$HOME/.rpmmacros"
         echo "%_source_filedigest_algorithm 0" >> "$HOME/.rpmmacros"
         echo "%_binary_filedigest_algorithm 0" >> "$HOME/.rpmmacros"
