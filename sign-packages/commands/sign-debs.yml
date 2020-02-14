@@ -4,7 +4,7 @@ parameters:
   gnupghome:
     description: the directory to place GnuPG config in
     type: string
-    default: "~/.gnupg"
+    default: "$HOME/.gnupg"
   gpgname:
     description: the name/email or key ID to use when signing
     type: string
