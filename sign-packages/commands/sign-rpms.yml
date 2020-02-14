@@ -12,10 +12,7 @@ steps:
       name: Sign RPM Packages
       command: |
         export GNUPGHOME="$HOME/.gnupg"
-        echo "$GPG_PASSPHRASE" \
-          | base64 --decode
-          > "$HOME/.gpg-passphrase" \
-          && chmod 600 "$HOME/.gpg-passphrase"
+        echo "$GPG_PASSPHRASE" | base64 --decode > "$HOME/.gpg-passphrase" && chmod 600 "$HOME/.gpg-passphrase"
         rpmsign \
           --define "passphrase_file $HOME/.gpg-passphrase" \
           --key-id='<< parameters.gpgname >>' \
