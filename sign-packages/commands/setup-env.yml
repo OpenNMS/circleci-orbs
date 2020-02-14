@@ -3,6 +3,11 @@ description: >
   Prepare the environment for GnuPG Debian and RPM signing, including
   initializing ~/.gnupg for loopback password entry and setting up
   ~/.rpmmacros to maximize compatibility.
+parameters:
+  gnupghome:
+    description: the directory to place GnuPG config in
+    type: string
+    default: "~/.gnupg"
 steps:
   - run:
       name: Configure GnuPG
@@ -18,7 +23,7 @@ steps:
           echo "ERROR: GnuPG 2.1 or higher is required"
           exit 1
         fi
-        export GNUPGHOME="$HOME/.gnupg"
+        export GNUPGHOME="<< parameters.gnupghome >>"
         eval $(gpg-agent --daemon --allow-loopback-pinentry)
         install -d -m 700 "$GNUPGHOME"
         echo "* created $GNUPGHOME"
@@ -26,7 +31,7 @@ steps:
         echo "* imported secret key"
         echo use-agent >> "$GNUPGHOME/gpg.conf"
         echo pinentry-mode loopback >> "$GNUPGHOME/gpg.conf"
-        echo "passphrase-file $HOME/.gpg-passphrase" >> "$GNUPGHOME/gpg.conf"
+        echo "passphrase-file << parameters.gnupghome >>/.gpg-passphrase" >> "$GNUPGHOME/gpg.conf"
         echo "* created $GNUPGHOME/gpg.conf:"
         cat "$GNUPGHOME/gpg.conf"
         echo allow-loopback-pinentry >> "$GNUPGHOME/gpg-agent.conf"
