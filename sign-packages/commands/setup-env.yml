@@ -18,15 +18,13 @@ steps:
           echo "ERROR: GnuPG 2.1 or higher is required"
           exit 1
         fi
-        export GNUPGHOME="$HOME/.gnupg"
+        export GNUPGHOME="${CIRCLE_WORKING_DIRECTORY}/.gnupg"
         eval $(gpg-agent --daemon --allow-loopback-pinentry)
         install -d -m 700 "$GNUPGHOME"
         echo "* created $GNUPGHOME"
-        echo "$GPG_SECRET_KEY" | base64 --decode | gpg --import --no-tty --batch --yes
-        echo "* imported secret key"
         echo use-agent >> "$GNUPGHOME/gpg.conf"
         echo pinentry-mode loopback >> "$GNUPGHOME/gpg.conf"
-        echo "passphrase-file $HOME/.gpg-passphrase" >> "$GNUPGHOME/gpg.conf"
+        echo "passphrase-file $GNUPGHOME/gpg-passphrase" >> "$GNUPGHOME/gpg.conf"
         echo "* created $GNUPGHOME/gpg.conf:"
         cat "$GNUPGHOME/gpg.conf"
         echo allow-loopback-pinentry >> "$GNUPGHOME/gpg-agent.conf"

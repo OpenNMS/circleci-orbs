@@ -15,8 +15,9 @@ steps:
   - run:
       name: Sign Debian Packages
       command: |
-        export GNUPGHOME="$HOME/.gnupg"
-        echo "$GPG_PASSPHRASE" | base64 --decode > "$HOME/.gpg-passphrase" && chmod 600 "$HOME/.gpg-passphrase"
+        export GNUPGHOME="${CIRCLE_WORKING_DIRECTORY}/.gnupg"
+        echo "$GPG_SECRET_KEY" | base64 --decode | gpg --import --no-tty --batch --yes
+        echo "$GPG_PASSPHRASE" | base64 --decode > "${GNUPGHOME}/gpg-passphrase" && chmod 600 "${GNUPGHOME}/gpg-passphrase"
         for package in << parameters.packages >>; do
           debsigs --sign=<< parameters.type >> --verify -k "<< parameters.gpgname >>" "$package" || break
         done
