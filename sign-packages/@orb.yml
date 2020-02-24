@@ -2,7 +2,7 @@
 version: 2.1
 
 description: |
-  Utilities for simplifying CircleCI workflows from OpenNMS.
+  Sign RPM and Debian Package in CircleCI.
 
   For any signing to work, we rely on the `allow-loopback-pinentry` feature
   of GnuPG, which was introduced in GnuPG 2.1.
