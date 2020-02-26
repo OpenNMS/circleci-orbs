@@ -15,5 +15,5 @@ usage:
         - sign-packages/install-rpm-dependencies
         - sign-packages/setup-env
         - sign-packages/sign-rpms:
-            gpgname: opennms@opennms.org
+            gnupg_key: opennms@opennms.org
             packages: dist/packages/*.rpm

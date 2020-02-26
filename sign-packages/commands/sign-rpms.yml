@@ -1,7 +1,11 @@
 ---
 description: Sign one or more RPM packages.
 parameters:
-  gpgname:
+  gnupg_home:
+    description: the location for GnuPG files
+    type: string
+    default: ~/.gnupg
+  gnupg_key:
     description: the name/email or key ID to use when signing
     type: string
   packages:
@@ -11,10 +15,8 @@ steps:
   - run:
       name: Sign RPM Packages
       command: |
-        export GNUPGHOME="${CIRCLE_WORKING_DIRECTORY}/.gnupg"
-        echo "$GPG_SECRET_KEY" | base64 --decode | gpg --import --no-tty --batch --yes
-        echo "$GPG_PASSPHRASE" | base64 --decode > "${GNUPGHOME}/gpg-passphrase" && chmod 600 "${GNUPGHOME}/gpg-passphrase"
+        export GNUPGHOME="$(realpath << parameters.gnupg_home >> || (cd << parameters.gnupg_home >>; pwd -P))"
         rpmsign \
           --define "passphrase_file ${GNUPGHOME}/gpg-passphrase" \
-          --key-id='<< parameters.gpgname >>' \
+          --key-id='<< parameters.gnupg_key >>' \
           --resign << parameters.packages >>

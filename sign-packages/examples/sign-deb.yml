@@ -16,6 +16,6 @@ usage:
         - sign-packages/install-deb-dependencies
         - sign-packages/setup-env
         - sign-packages/sign-debs:
-            gpgname: opennms@opennms.org
+            gnupg_key: opennms@opennms.org
             packages: "*.deb"
             type: maint

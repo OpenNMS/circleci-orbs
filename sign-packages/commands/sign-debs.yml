@@ -1,7 +1,11 @@
 ---
 description: Sign one or more Debian packages.
 parameters:
-  gpgname:
+  gnupg_home:
+    description: the location for GnuPG files
+    type: string
+    default: ~/.gnupg
+  gnupg_key:
     description: the name/email or key ID to use when signing
     type: string
   packages:
@@ -15,9 +19,7 @@ steps:
   - run:
       name: Sign Debian Packages
       command: |
-        export GNUPGHOME="${CIRCLE_WORKING_DIRECTORY}/.gnupg"
-        echo "$GPG_SECRET_KEY" | base64 --decode | gpg --import --no-tty --batch --yes
-        echo "$GPG_PASSPHRASE" | base64 --decode > "${GNUPGHOME}/gpg-passphrase" && chmod 600 "${GNUPGHOME}/gpg-passphrase"
+        export GNUPGHOME="$(realpath << parameters.gnupg_home >> || (cd << parameters.gnupg_home >>; pwd -P))"
         for package in << parameters.packages >>; do
-          debsigs --sign=<< parameters.type >> --verify -k "<< parameters.gpgname >>" "$package" || break
+          debsigs --sign=<< parameters.type >> --verify -k "<< parameters.gnupg_key >>" "$package" || break
         done
