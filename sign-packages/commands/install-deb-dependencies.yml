@@ -4,7 +4,7 @@ parameters:
   skip_if_forked_pr:
     description: whether to skip running if this command is run on a forked PR
     type: boolean
-    default: true
+    default: false
 steps:
   - run:
       name: Install Debian Signing Dependencies
