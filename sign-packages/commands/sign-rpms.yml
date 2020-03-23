@@ -11,10 +11,20 @@ parameters:
   packages:
     description: the RPM packages to sign
     type: string
+  skip_if_forked_pr:
+    description: whether to skip running if this command is run on a forked PR
+    type: boolean
+    default: true
 steps:
   - run:
       name: Sign RPM Packages
       command: |
+        <<# parameters.skip_if_forked_pr >>
+          if [ -n "$CIRCLE_PR_NUMBER" ]; then
+            echo "Skipping RPM package signing for pull request #${CIRCLE_PR_NUMBER}."
+            exit 0
+          fi
+        <</ parameters.skip_if_forked_pr >>
         export GNUPGHOME="$(realpath << parameters.gnupg_home >> || (cd << parameters.gnupg_home >>; pwd -P))"
         rpmsign \
           --define "passphrase_file ${GNUPGHOME}/gpg-passphrase" \

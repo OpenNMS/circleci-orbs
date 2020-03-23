@@ -1,6 +1,18 @@
 ---
 description: Install RPM dependencies necessary for package signing.
+parameters:
+  skip_if_forked_pr:
+    description: whether to skip running if this command is run on a forked PR
+    type: boolean
+    default: true
 steps:
   - run:
       name: Install RPM Signing Dependencies
-      command: yum -y install rpm-sign gnupg2
+      command: |
+        <<# parameters.skip_if_forked_pr >>
+          if [ -n "$CIRCLE_PR_NUMBER" ]; then
+            echo "Skipping RPM package install for pull request #${CIRCLE_PR_NUMBER}."
+            exit 0
+          fi
+        <</ parameters.skip_if_forked_pr >>
+        yum -y install rpm-sign gnupg2

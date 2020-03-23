@@ -1,6 +1,18 @@
 ---
 description: Install Debian dependencies necessary for package signing.
+parameters:
+  skip_if_forked_pr:
+    description: whether to skip running if this command is run on a forked PR
+    type: boolean
+    default: true
 steps:
   - run:
       name: Install Debian Signing Dependencies
-      command: apt-get update && apt-get -y install gnupg2 debsigs
+      command: |
+        <<# parameters.skip_if_forked_pr >>
+          if [ -n "$CIRCLE_PR_NUMBER" ]; then
+            echo "Skipping Debian package install for pull request #${CIRCLE_PR_NUMBER}."
+            exit 0
+          fi
+        <</ parameters.skip_if_forked_pr >>
+        apt-get update && apt-get -y install gnupg2 debsigs

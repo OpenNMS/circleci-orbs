@@ -8,10 +8,20 @@ parameters:
     description: the location for GnuPG files
     type: string
     default: ~/.gnupg
+  skip_if_forked_pr:
+    description: whether to skip running if this command is run on a forked PR
+    type: boolean
+    default: true
 steps:
   - run:
       name: Configure GnuPG
       command: |
+        <<# parameters.skip_if_forked_pr >>
+          if [ -n "$CIRCLE_PR_NUMBER" ]; then
+            echo "Skipping GnuPG configuration for pull request #${CIRCLE_PR_NUMBER}."
+            exit 0
+          fi
+        <</ parameters.skip_if_forked_pr >>
         if [ -z "$GPG_PASSPHRASE" ]; then
           echo "WARNING: no Base64 GPG passphrase supplied in CircleCI environment"
         fi

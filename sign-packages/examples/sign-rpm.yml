@@ -3,7 +3,7 @@ description: Sign an RPM package
 usage:
   version: 2.1
   orbs:
-    sign-packages: opennms/sign-packages@2.0.0
+    sign-packages: opennms/sign-packages@2.1.0
   jobs:
     build:
       docker:
