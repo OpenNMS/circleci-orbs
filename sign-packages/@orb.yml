@@ -28,3 +28,6 @@ description: |
 
     If your GPG key does not have a pass phrase, this variable is
     optional.
+
+display:
+  source_url: https://github.com/opennms/orb
