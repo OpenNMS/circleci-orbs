@@ -15,4 +15,5 @@ steps:
             exit 0
           fi
         <</ parameters.skip_if_forked_pr >>
-        yum -y install rpm-sign gnupg2
+        SUDO="$(command -v sudo 2>/dev/null || which sudo 2>/dev/null)"
+        $SUDO yum -y install rpm-sign gnupg2
