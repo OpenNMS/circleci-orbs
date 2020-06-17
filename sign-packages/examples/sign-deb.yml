@@ -3,7 +3,7 @@ description: Sign a Debian package
 usage:
   version: 2.1
   orbs:
-    sign-packages: opennms/sign-packages@2.1.1
+    sign-packages: opennms/sign-packages@2.1.2
   jobs:
     build:
       docker:
