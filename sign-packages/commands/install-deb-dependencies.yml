@@ -16,4 +16,4 @@ steps:
           fi
         <</ parameters.skip_if_forked_pr >>
         SUDO="$(command -v sudo 2>/dev/null || which sudo 2>/dev/null)"
-        $SUDO apt-get update && $SUDO apt-get -y install gnupg2 debsigs
+        $SUDO apt-get --allow-releaseinfo-change update && $SUDO apt-get -y install gnupg2 debsigs
