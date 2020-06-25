@@ -5,6 +5,10 @@ parameters:
     description: whether to skip running if this command is run on a forked PR
     type: boolean
     default: false
+  use_sudo:
+    description: whether to use `sudo` for dnf/yum commands
+    type: boolean
+    default: false
 steps:
   - run:
       name: Install RPM Signing Dependencies
@@ -15,4 +19,8 @@ steps:
             exit 0
           fi
         <</ parameters.skip_if_forked_pr >>
-        yum -y install rpm-sign gnupg2
+        DNF="$(command -v dnf 2>/dev/null || which dnf 2>/dev/null || command -v yum 2>/dev/null || which yum 2>/dev/null)"
+        <<# parameters.use_sudo >>
+        DNF="sudo $DNF"
+        <</ parameters.use_sudo >>
+        $DNF -y install rpm-sign gnupg2

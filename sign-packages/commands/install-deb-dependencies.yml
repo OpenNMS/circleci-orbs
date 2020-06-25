@@ -5,6 +5,10 @@ parameters:
     description: whether to skip running if this command is run on a forked PR
     type: boolean
     default: false
+  use_sudo:
+    description: whether to use `sudo` for apt-get commands
+    type: boolean
+    default: false
 steps:
   - run:
       name: Install Debian Signing Dependencies
@@ -15,4 +19,9 @@ steps:
             exit 0
           fi
         <</ parameters.skip_if_forked_pr >>
-        apt-get --allow-releaseinfo-change update && apt-get -y install gnupg2 debsigs
+        APT_GET="$(command -v apt-get 2>/dev/null || which apt-get 2>/dev/null)"
+        <<# parameters.use_sudo >>
+        APT_GET="sudo $APT_GET"
+        <</ parameters.use_sudo >>
+        ($APT_GET --allow-releaseinfo-change update 2>/dev/null || $APT_GET update) || exit 1
+        $APT_GET -y install gnupg2 debsigs
