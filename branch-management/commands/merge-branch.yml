@@ -1,0 +1,51 @@
+---
+description: Merge a branch.
+parameters:
+  committer_email:
+    description: the author email address to commit with
+    type: string
+  committer_name:
+    description: the author name to commit with
+    type: string
+  from:
+    description: the branch to merge from
+    type: string
+  remote_from:
+    description: the remote the `from` branch is from
+    type: string
+    default: origin
+  to:
+    description: the branch to merge to
+    type: string
+  remote_to:
+    description: the remote the `to` branch is from
+    type: string
+    default: origin
+  skip_if_forked_pr:
+    description: whether to skip running if this command is run on a forked PR
+    type: boolean
+    default: true
+
+steps:
+  - run:
+      name: Validate Git and CircleCI environment
+      command: |
+        <<# parameters.skip_if_forked_pr >>
+          if [ -n "$CIRCLE_PR_NUMBER" ]; then
+            echo "Skipping Debian package signing for pull request #${CIRCLE_PR_NUMBER}."
+            exit 0
+          fi
+        <</ parameters.skip_if_forked_pr >>
+        git config merge.renameLimit 999999
+        git config user.email "<< parameters.committer_email >>"
+        git config user.name "<< parameters.committer_name >>"
+  - run:
+      name: Fetch remote repo(s)
+      command: git fetch --multiple << parameters.remote_from >> << parameters.remote_to >>
+  - run:
+      name: Check out target branch and merge source branch
+      command: |
+        export GIT_MERGE_AUTOEDIT=no
+        git checkout "<< parameters.to >>"
+        git reset --hard "<< parameters.remote_to >>/<< parameters.to >>"
+        git merge "<< parameters.remote_from >>/<< parameters.from >>"

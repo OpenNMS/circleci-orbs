@@ -1,8 +1,9 @@
 version: 2.1
 
 orbs:
-  orb-tools: circleci/orb-tools@9.0.0
-  sign-packages: opennms/sign-packages@<< pipeline.parameters.dev-orb-version >>
+  orb-tools: circleci/orb-tools@10.0.2
+#  branch-management: opennms/branch-management@<< pipeline.parameters.dev-orb-version >>
+#  sign-packages: opennms/sign-packages@<< pipeline.parameters.dev-orb-version >>
 
 parameters:
   dev-orb-version:
@@ -10,7 +11,31 @@ parameters:
     default: "dev:alpha"
 
 workflows:
-  verify-and-publish:
+  branch-management-verify-and-publish:
+    jobs:
+      - orb-tools/lint:
+          filters:
+            tags:
+              only: /.*/
+      - orb-tools/pack:
+          artifact-path: branch-management.yml
+          destination-orb-path: branch-management.yml
+          workspace-path: branch-management.yml
+          source-dir: branch-management
+          filters:
+            tags:
+              only: /.*/
+      - orb-tools/publish:
+          attach-workspace: true
+          orb-path: workspace/branch-management.yml
+          orb-ref: opennms/branch-management@<< pipeline.parameters.dev-orb-version >>
+          filters:
+            tags:
+              only: /.*/
+          requires:
+            - orb-tools/lint
+            - orb-tools/pack
+  sign-packages-verify-and-publish:
     jobs:
       - orb-tools/lint:
           filters:

@@ -1,0 +1,8 @@
+---
+version: 2.1
+
+description: |
+  Handle branch merges in CircleCI.
+
+display:
+  source_url: https://github.com/opennms/orb

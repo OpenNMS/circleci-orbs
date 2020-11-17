@@ -1,0 +1,17 @@
+---
+description: Merge a branch
+usage:
+  version: 2.1
+  orbs:
+    branch-management: opennms/branch-management@x.x.x
+  jobs:
+    build:
+      docker:
+        - image: debian:stretch
+      steps:
+        - checkout
+        - branch-management/merge-branch:
+            committer_email: "cicd@example.com"
+            committer_name: "CircleCI Merge Automation"
+            from: develop
+            to: main
