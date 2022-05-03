@@ -1,61 +1,56 @@
 version: 2.1
-
+setup: true
 orbs:
-  orb-tools: circleci/orb-tools@10.0.2
-#  branch-management: opennms/branch-management@<< pipeline.parameters.dev-orb-version >>
-#  sign-packages: opennms/sign-packages@<< pipeline.parameters.dev-orb-version >>
+  orb-tools: circleci/orb-tools@11.1.3
+  shellcheck: circleci/shellcheck@3.1.1
 
-parameters:
-  dev-orb-version:
-    type: string
-    default: "dev:alpha"
+filters: &filters
+  tags:
+    only: /^v.*/
 
 workflows:
-  branch-management-verify-and-publish:
+  lint-pack:
     jobs:
       - orb-tools/lint:
-          filters:
-            tags:
-              only: /.*/
+          filters: *filters
       - orb-tools/pack:
-          artifact-path: branch-management.yml
-          destination-orb-path: branch-management.yml
-          workspace-path: branch-management.yml
+          name: pack-branch-management
+          output-dir: workspace/branch-management
           source-dir: branch-management
-          filters:
-            tags:
-              only: /.*/
-      - orb-tools/publish:
-          attach-workspace: true
-          orb-path: workspace/branch-management.yml
-          orb-ref: opennms/branch-management@<< pipeline.parameters.dev-orb-version >>
-          filters:
-            tags:
-              only: /.*/
-          requires:
-            - orb-tools/lint
-            - orb-tools/pack
-  sign-packages-verify-and-publish:
-    jobs:
-      - orb-tools/lint:
-          filters:
-            tags:
-              only: /.*/
+          filters: *filters
       - orb-tools/pack:
-          artifact-path: sign-packages.yml
-          destination-orb-path: sign-packages.yml
-          workspace-path: sign-packages.yml
+          name: pack-sign-packages
+          output-dir: workspace/sign-packages
           source-dir: sign-packages
-          filters:
-            tags:
-              only: /.*/
+          filters: *filters
+      - orb-tools/review:
+          filters: *filters
+      - shellcheck/check:
+          exclude: SC2148,SC2038,SC2086,SC2002,SC2016
+          filters: *filters
       - orb-tools/publish:
-          attach-workspace: true
-          orb-path: workspace/sign-packages.yml
-          orb-ref: opennms/sign-packages@<< pipeline.parameters.dev-orb-version >>
-          filters:
-            tags:
-              only: /.*/
+          name: publish-branch-management
+          orb-name: opennms/branch-management
+          orb-dir: workspace/branch-management
+          vcs-type: << pipeline.project.type >>
           requires:
-            - orb-tools/lint
-            - orb-tools/pack
+            [orb-tools/lint, orb-tools/review, pack-branch-management, shellcheck/check]
+          # Use a context to hold your publishing token.
+          context: orb-publishing
+          filters: *filters
+      - orb-tools/publish:
+          name: publish-sign-packages
+          orb-name: opennms/sign-packages
+          orb-dir: workspace/sign-packages
+          vcs-type: << pipeline.project.type >>
+          requires:
+            [orb-tools/lint, orb-tools/review, pack-sign-packages, shellcheck/check]
+          # Use a context to hold your publishing token.
+          context: orb-publishing
+          filters: *filters
+      # Triggers the next workflow in the Orb Development Kit.
+      - orb-tools/continue:
+          pipeline-number: << pipeline.number >>
+          vcs-type: << pipeline.project.type >>
+          requires: [publish-branch-management, publish-sign-packages]
+          filters: *filters
