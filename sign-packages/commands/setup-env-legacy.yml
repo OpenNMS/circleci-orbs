@@ -55,9 +55,8 @@ steps:
   - run:
       name: Configure RPM Macros
       command: |
-        # 8 = SHA256 digests
-        echo "%_source_filedigest_algorithm 8" >> "$HOME/.rpmmacros"
-        echo "%_binary_filedigest_algorithm 8" >> "$HOME/.rpmmacros"
+        echo "%_source_filedigest_algorithm 0" >> "$HOME/.rpmmacros"
+        echo "%_binary_filedigest_algorithm 0" >> "$HOME/.rpmmacros"
         echo "%_source_payload w0.bzdio" >> "$HOME/.rpmmacros"
         echo "%_binary_payload w0.bzdio" >> "$HOME/.rpmmacros"
         echo "%__gpg_sign_cmd %{__gpg} gpg --batch --no-verbose --no-armor --no-secmem-warning --force-v3-sigs %{?_gpg_sign_cmd_extra_args:%{_gpg_sign_cmd_extra_args}} %{?passphrase_file:--passphrase-file "%{passphrase_file}"} -u '%{_gpg_name}' -sbo %{__signature_filename} %{__plaintext_filename}" >> "$HOME/.rpmmacros"
