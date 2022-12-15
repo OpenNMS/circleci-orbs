@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  orb-tools: circleci/orb-tools@10.0.2
+  orb-tools: circleci/orb-tools@10.1.0
 #  branch-management: opennms/branch-management@<< pipeline.parameters.dev-orb-version >>
 #  sign-packages: opennms/sign-packages@<< pipeline.parameters.dev-orb-version >>
 
