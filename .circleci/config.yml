@@ -26,6 +26,8 @@ workflows:
             tags:
               only: /.*/
       - orb-tools/publish:
+          context:
+            - "CircleCI"
           attach-workspace: true
           orb-path: workspace/branch-management.yml
           orb-ref: opennms/branch-management@<< pipeline.parameters.dev-orb-version >>
@@ -50,6 +52,8 @@ workflows:
             tags:
               only: /.*/
       - orb-tools/publish:
+          context:
+            - "CircleCI"
           attach-workspace: true
           orb-path: workspace/sign-packages.yml
           orb-ref: opennms/sign-packages@<< pipeline.parameters.dev-orb-version >>
