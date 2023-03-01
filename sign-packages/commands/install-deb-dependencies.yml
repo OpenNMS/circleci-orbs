@@ -23,5 +23,14 @@ steps:
         <<# parameters.use_sudo >>
         APT_GET="sudo $APT_GET"
         <</ parameters.use_sudo >>
-        ($APT_GET --allow-releaseinfo-change update 2>/dev/null || $APT_GET update) || exit 1
+        (
+          $APT_GET --allow-releaseinfo-change update \
+            -o Dir::Etc::sourcelist="sources.list" \
+            -o Dir::Etc::sourceparts="-" \
+            -o APT::Get::List-Cleanup="0" 2>/dev/null || \
+          $APT_GET update \
+            -o Dir::Etc::sourcelist="sources.list" \
+            -o Dir::Etc::sourceparts="-" \
+            -o APT::Get::List-Cleanup="0"
+        ) || exit 1
         $APT_GET -y install gnupg2 debsigs
